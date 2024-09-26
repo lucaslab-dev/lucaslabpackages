@@ -1,0 +1,100 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  @for (control of configurations(); track control.label) {
+    <div [class]="customClasses().container">
+      <label for="{{ control.property }}" [class]="customClasses().label">
+        {{ control.label }}
+      </label>
+
+      @switch (control.type) {
+        @case ("text") {
+          <input
+            type="text"
+            [formControlName]="control.property"
+            [placeholder]="control.placeholder ?? ''"
+            [class]="customClasses().input"
+            id="{{ control.property }}"
+          />
+        }
+        @case ("email") {
+          <input
+            type="email"
+            [formControlName]="control.property"
+            [placeholder]="control.placeholder ?? ''"
+            [class]="customClasses().input"
+            id="{{ control.property }}"
+          />
+        }
+        @case ("number") {
+          <input
+            type="number"
+            [formControlName]="control.property"
+            [placeholder]="control.placeholder ?? ''"
+            [class]="customClasses().input"
+            id="{{ control.property }}"
+          />
+        }
+        @case ("select") {
+          <select
+            [formControlName]="control.property"
+            [class]="customClasses().input"
+            id="{{ control.property }}-select"
+          >
+            <option value="" disabled selected>Selecione uma opção</option>
+
+            @for (option of control.options; track option) {
+              <option value="{{ option.key }}">{{ option.value }}</option>
+            }
+          </select>
+        }
+        @case ("radio") {
+          @for (option of control.options; track option.key) {
+            <p>
+              <label>
+                <input
+                  type="radio"
+                  [class]="customClasses().input"
+                  [formControlName]="control.property"
+                  id="{{ control.property }}.{{ option.key }}"
+                  [value]="option.key"
+                />
+                {{ option.value }}
+              </label>
+            </p>
+          }
+        }
+        @case ("checkbox") {
+          @for (option of control.options; track option.key) {
+            <p>
+              <label>
+                <input
+                  type="checkbox"
+                  [class]="customClasses().input"
+                  id="{{ control.property }}.{{ option.key }}"
+                  (change)="updateCheckboxSelection(control.property, option)"
+                  [checked]="hasOption(control.property, option.key)"
+                />
+                {{ option.value }}
+              </label>
+            </p>
+          }
+        }
+      }
+
+      @if (
+        form.get(control.property)?.touched &&
+        form.get(control.property)?.invalid
+      ) {
+        <span [class]="customClasses().error">
+          {{ control.label }} {{ getErrorMessage(control.property) }}
+        </span>
+      }
+    </div>
+  }
+
+  <div [class]="customClasses().container">
+    <button type="submit" [class]="customClasses().submit">Submit</button>
+    <button type="button" [class]="customClasses().cancel" (click)="onCancel()">
+      Cancel
+    </button>
+  </div>
+</form>
